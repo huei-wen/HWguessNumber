@@ -1,0 +1,93 @@
+<script>
+    function createAnswer(n = 3) {
+        let poker = [];
+        for (let i = 0; i < 10; i++) poker[i] = i;
+        for (let i = poker.length - 1; i > 0; i--) {
+            let rand = parseInt(Math.random() * (i + 1));
+            [poker[i], poker[rand]] = [poker[rand], poker[i]];
+        }
+        let ret = '';
+        for (let i = 0; i < n; i++) {
+            ret += poker[i];
+        }
+        return ret;
+    }
+
+    function checkAB(ans, gus) {
+        let a = 0, b = 0;
+        for (let i = 0; i < gus.length; i++) {
+            if (gus.charAt(i) == ans.charAt(i)) {
+                a++;
+            } else if (ans.indexOf(gus.charAt(i)) >= 0) {
+                b++;
+            }
+        }
+        return `${a}A${b}B`;
+    }
+
+    let answer;
+    let logtext = '';
+    let times = 0;
+    let d;
+
+    function doGuess() {
+        if (times == 0) {
+            answer = createAnswer(document.getElementById("how").value);
+            d = answer.length;
+        }
+
+        times++;
+        let guess = document.getElementById("input").value;
+        if (isOK(guess) == false) {
+            alert(`${guess}有重複數字`);
+        }
+        let result = checkAB(answer, guess);
+        alert(`${times}: ${guess} => ${result}`);
+        logtext += `${guess} => ${result}<br>`;
+
+        document.getElementById("log").innerHTML = logtext;
+        document.getElementById("input").value = '';
+        if (result == `${d}A0B`) {
+            alert(`congratulation`);
+            replay();
+        } else if (times == 10) {
+            alert(`0487`);
+            replay();
+        }
+        document.getElementById('input').focus();
+    }
+    function replay() {
+        answer = createAnswer(d);
+        logtext = '';
+        times = 0;
+        document.getElementById("input").value = '';
+        document.getElementById("log").innerHTML = '';
+
+    }
+    function isOK(guess) {
+        for (let i = 0; i < guess.length; i++) {
+            for (let j = i+1; j <= guess.length; j++) {
+                if (guess.charAt(i) == guess.charAt(j)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+</script>
+<h1>Guess Number Game</h1>
+<hr>
+<label class="col-md-4 control-label" for="textinput">請選擇幾位數:</label>
+<select id="how">
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+</select>
+<hr>
+<input type="number" id="input" />
+<input type="button" value="Guess" onclick="doGuess()" />
+<input type="button" value="replay" onclick="replay()" />
+<hr>
+<div id="log">
+</div>
